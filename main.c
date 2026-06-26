@@ -9,7 +9,8 @@
 #define COLUMNAS 5             // CANTIDAD COLUMNAS MATRIZ
 #define FILAS_PRIORITARIAS 2   // CANTIDAD FILAS PRIORITARIAS
 #define FILA_INICIO_GENERAL 2  // INICIO FILAS GENERALES MATRIZ
-#define CANT_FILAS_GENERALES 4 // FIN FILAS GENERALES
+#define CANT_FILAS_GENERALES 3 // FIN FILAS GENERALES
+
 
 // Estructura que define cada usuario del sistema
 typedef struct
@@ -26,6 +27,7 @@ typedef struct
     int tieneVehiculo; // 1 si tiene vehiculo, 0 si no tiene
 } Usuario;
 
+void matrizEstacionamientoTest(int matriz[FILAS][COLUMNAS]);
 int lugaresGeneralesLibres(int matriz[FILAS][COLUMNAS]);
 int lugaresPrioritariosLibres(int matriz[FILAS][COLUMNAS]);
 Usuario usuarioSinSesion();
@@ -55,9 +57,16 @@ int main()
     Usuario user = usuarioSinSesion();
     int cantidadUsuarios = 0;
     int matriz[FILAS][COLUMNAS];
+    int modoTestEstacionamiento = 0;
     Usuario clientes[100];
     srand((unsigned int)time(NULL));
-    matrizEstacionamiento(matriz);
+
+    if (modoTestEstacionamiento == 1) {
+        matrizEstacionamientoTest(matriz);
+        printf("Modo TEST: generales ocupados, prioritarios libres.\n");
+    } else {
+        matrizEstacionamiento(matriz);
+    }
     mostrarMatriz(matriz);
     do
     {
@@ -349,7 +358,7 @@ int pedirBooleano(char mensaje[])
         printf("%s", mensaje);
         scanf("%9s", opcion);
 
-        if (!esNumero(opcion))
+        if(!esNumero(opcion))
         {
             printf("[ERROR] Debe ingresar 0 o 1\n");
             continue;
@@ -357,7 +366,12 @@ int pedirBooleano(char mensaje[])
 
         valor = atoi(opcion);
 
-    } while (validacionConjuntoP(valor) == 0);
+        if(validacionConjuntoP(valor) == 0)
+        {
+            printf("[ERROR] Debe ingresar 0 o 1\n");
+        }
+
+    } while(!esNumero(opcion) || validacionConjuntoP(valor) == 0);
 
     return valor;
 }
@@ -600,4 +614,22 @@ void actualizarListaClientes(Usuario clientes[], int cantidadUsuarios, Usuario u
     }
 };
 
+void matrizEstacionamientoTest(int matriz[FILAS][COLUMNAS])
+{
+    int fila;
+    int columna;
 
+    // Zona prioritaria libre (0)
+    for (fila = 0; fila < FILAS_PRIORITARIAS; fila++) {
+        for (columna = 0; columna < COLUMNAS; columna++) {
+            matriz[fila][columna] = 0;
+        }
+    }
+
+    // Zona general ocupada (1)
+    for (fila = FILA_INICIO_GENERAL; fila < FILAS; fila++) {
+        for (columna = 0; columna < COLUMNAS; columna++) {
+            matriz[fila][columna] = 1;
+        }
+    }
+}
